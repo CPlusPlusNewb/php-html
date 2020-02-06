@@ -1,0 +1,31 @@
+static bool spoofed = false;
+            if (!spoofed) {
+                ConVar* sv_cheats = g_CVar->FindVar("sv_cheats");
+                SpoofedConvar* sv_cheats_spoofed = new SpoofedConvar(sv_cheats);
+                sv_cheats_spoofed->SetInt(1);
+                spoofed = true;
+            }
+     
+            static bool set = false;
+            static bool lastsetting = false;
+            static int distancecor = 150;
+            if (!set) {
+                if (g_Options.misc_tps && g_LocalPlayer->IsAlive())
+                {
+                    g_EngineClient->ExecuteClientCmd("thirdperson");
+                    std::string distance = "cam_idealdist " + std::to_string(g_Options.misc_tps_dis);
+                    g_EngineClient->ExecuteClientCmd(distance.c_str());
+                    distancecor = g_Options.misc_tps_dis;
+                    lastsetting = true;
+                } else {
+                    g_EngineClient->ExecuteClientCmd("firstperson");
+                    lastsetting = false;
+                }
+                set = true;
+            }
+     
+            if (g_Options.misc_tps != lastsetting || g_Options.misc_tps_dis != distancecor) {
+                distancecor = g_Options.misc_tps_dis;
+                lastsetting = g_Options.misc_tps;
+                set = false;
+            }
